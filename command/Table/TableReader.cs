@@ -39,6 +39,7 @@ namespace command
 
         void runFile(string nFile, string nDestDirectory)
         {
+            if (!nFile.EndsWith(".xlsx")) return;
             FileStream excelFile_ = File.Open(nFile, FileMode.Open, FileAccess.Read);
             IExcelDataReader excelReader_ = ExcelReaderFactory.CreateOpenXmlReader(excelFile_);
             excelReader_.IsFirstRowAsColumnNames = true;
