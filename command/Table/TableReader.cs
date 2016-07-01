@@ -65,7 +65,7 @@ namespace command
             {
                 DataRow rows_ = nDataTable.Rows[i];
                 string key_ = rows_[0].ToString();
-                object value_ = rows_[i];
+                object value_ = rows_[1];
                 if (value_.GetType() == typeof(double))
                 {
                     double number_ = (double)value_;
@@ -117,11 +117,12 @@ namespace command
                     }
                     string name_ = j.ToString();
                     string value_ = ovalue_.ToString();
-                    if (mStrings.ContainsKey(name_))
+                    string key_ = name_ + ".i";
+                    if (mStrings.ContainsKey(key_))
                     {
-                        if (mStrings[name_].ContainsKey(value_))
+                        if (mStrings[key_].ContainsKey(value_))
                         {
-                            value_ = mStrings[name_][value_];
+                            value_ = mStrings[key_][value_];
                         }
                     }
                     row_[name_] = value_;
