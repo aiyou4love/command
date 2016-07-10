@@ -60,7 +60,7 @@ namespace command
         void runDataSet(DataTable nDataTable)
         {
             if (!nDataTable.TableName.EndsWith(".i")) return;
-            if (nDataTable.Columns.Count != 2) return;
+            if (nDataTable.Columns.Count < 2) return;
             Dictionary<string, string> stringValue_ = new Dictionary<string, string>();
             for (int i = 0; i < nDataTable.Rows.Count; i++)
             {
