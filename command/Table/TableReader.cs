@@ -42,8 +42,12 @@ namespace command
             if (!nFile.EndsWith(".xlsx")) return;
             FileStream excelFile_ = File.Open(nFile, FileMode.Open, FileAccess.Read);
             IExcelDataReader excelReader_ = ExcelReaderFactory.CreateOpenXmlReader(excelFile_);
-            excelReader_.IsFirstRowAsColumnNames = true;
+            excelReader_.IsFirstRowAsColumnNames = false;
             DataSet excelData_ = excelReader_.AsDataSet();
+            for (int i = 0; i < excelData_.Tables.Count; ++i)
+            {
+                runKeys(excelData_.Tables[i]);
+            }
             for (int i = 0; i < excelData_.Tables.Count; ++i)
             {
                 runDataSet(excelData_.Tables[i]);
@@ -56,10 +60,33 @@ namespace command
             excelFile_.Close();
         }
 
+        Dictionary<string, string> mKeys = new Dictionary<string, string>();
+        void runKeys(DataTable nDataTable)
+        {
+            if (!nDataTable.TableName.EndsWith(".i")) return;
+            if (nDataTable.Columns.Count < 2) return;
+            mKeys.Clear();
+            for (int i = 0; i < nDataTable.Rows.Count; i++)
+            {
+                DataRow rows_ = nDataTable.Rows[i];
+                string key_ = rows_[0].ToString();
+                object value_ = rows_[1];
+                if (value_.GetType() == typeof(double))
+                {
+                    double number_ = (double)value_;
+                    if ((int)number_ == number_)
+                    {
+                        value_ = (int)number_;
+                    }
+                }
+                mKeys[key_] = value_.ToString();
+            }
+        }
+
         Dictionary<string, Dictionary<string, string>> mStrings = new Dictionary<string, Dictionary<string, string>>();
         void runDataSet(DataTable nDataTable)
         {
-            if (!nDataTable.TableName.EndsWith(".i")) return;
+            if (!nDataTable.TableName.EndsWith(".j")) return;
             if (nDataTable.Columns.Count < 2) return;
             Dictionary<string, string> stringValue_ = new Dictionary<string, string>();
             for (int i = 0; i < nDataTable.Rows.Count; i++)
@@ -89,22 +116,26 @@ namespace command
             jsonWriter_.Close();
             streamWriter_.Close();
         }
+
         List<Dictionary<string, string>> mValues = new List<Dictionary<string, string>>();
         void runDataSet(DataTable nDataTable, string nDestDirectory)
         {
             if (nDataTable.TableName.EndsWith(".i")) return;
+            if (nDataTable.TableName.EndsWith(".j")) return;
 
             mValues.Clear();
 
             if (nDataTable.Columns.Count <= 0) return;
             if (nDataTable.Rows.Count < 3) return;
-            DataRow types_ = nDataTable.Rows[0];
-            for (int i = 2; i < nDataTable.Rows.Count; i++)
+            DataRow names_ = nDataTable.Rows[0];
+            DataRow types_ = nDataTable.Rows[1];
+            for (int i = 3; i < nDataTable.Rows.Count; i++)
             {
                 Dictionary<string, string> row_ = new Dictionary<string, string>();
                 DataRow values_ = nDataTable.Rows[i];
                 foreach (DataColumn j in nDataTable.Columns)
                 {
+                    string name_ = (string)names_[j];
                     string type_ = (string)types_[j];
                     if ("null" == type_) continue;
                     object ovalue_ = values_[j];
@@ -116,14 +147,16 @@ namespace command
                             ovalue_ = (int)number_;
                         }
                     }
-                    string name_ = j.ToString();
                     string value_ = ovalue_.ToString();
-                    string key_ = name_ + ".i";
-                    if (mStrings.ContainsKey(key_))
+                    if (mKeys.ContainsKey(name_))
                     {
-                        if (mStrings[key_].ContainsKey(value_))
+                        string key_ = mKeys[name_];
+                        if (mStrings.ContainsKey(key_))
                         {
-                            value_ = mStrings[key_][value_];
+                            if (mStrings[key_].ContainsKey(value_))
+                            {
+                                value_ = mStrings[key_][value_];
+                            }
                         }
                     }
                     row_[name_] = value_;
