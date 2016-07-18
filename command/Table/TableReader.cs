@@ -133,8 +133,17 @@ namespace command
             {
                 Dictionary<string, string> row_ = new Dictionary<string, string>();
                 DataRow values_ = nDataTable.Rows[i];
-                string begin_ = (string)values_[0];
-                if ( ("" == begin_) || (null == begin_) )
+                object begin_ = values_[0];
+                if (begin_.GetType() == typeof(double))
+                {
+                    double number_ = (double)begin_;
+                    if ((int)number_ == number_)
+                    {
+                        begin_ = (int)number_;
+                    }
+                }
+                string strbegin_ = begin_.ToString();
+                if ( ("" == strbegin_) || ("0" == strbegin_) || (null == strbegin_) )
                 {
                     continue;
                 }
