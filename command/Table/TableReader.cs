@@ -133,6 +133,11 @@ namespace command
             {
                 Dictionary<string, string> row_ = new Dictionary<string, string>();
                 DataRow values_ = nDataTable.Rows[i];
+                string begin_ = (string)values_[0];
+                if ( ("" == begin_) || (null == begin_) )
+                {
+                    continue;
+                }
                 foreach (DataColumn j in nDataTable.Columns)
                 {
                     string name_ = (string)names_[j];
