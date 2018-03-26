@@ -122,6 +122,7 @@ namespace command
         {
             if (nDataTable.TableName.EndsWith(".i")) return;
             if (nDataTable.TableName.EndsWith(".j")) return;
+			if (nDataTable.TableName.EndsWith(".l")) return;
 
             mValues.Clear();
 
